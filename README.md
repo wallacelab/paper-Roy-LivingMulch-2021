@@ -1,2 +1,2 @@
-# paper-Roy-LivingMulch-2021
-publish living mulch data and scripts 
+# Support scripts for Li et al 2021, "Living mulch fosters a more diverse and balanced bacterial community in corn production".
+
