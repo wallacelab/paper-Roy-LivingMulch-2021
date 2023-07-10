@@ -380,13 +380,14 @@ done <beta_diversity_metrics.txt
 
 results_path="core-metrics-results-May-table-no-mitochondria-no-chloroplast_filtered-19000 core-metrics-results-June-table-no-mitochondria-no-chloroplast_filtered-28000 core-metrics-results-August-table-no-mitochondria-no-chloroplast_filtered-26000"
 
-correlation_method=("spearman pearson")
+correlation_method=("spearman")
 
      for file in $results_path; \
 do \
   echo $file
   
   
+#create distance matrix for each environmental factor   
   while read line ; do
     echo $line
     
@@ -394,7 +395,8 @@ do \
   --m-metadata-file living_mulch_data_metafile_massalin_no_blank.tsv \
   --m-metadata-column $line \
   --o-distance-matrix $file/${line}_distance_matrix.qza 
-  
+ 
+# run 999 permutations mantel tests with environmental factors and three beta diversity metrics 
 for method in $correlation_method; \
   do 
       echo $method
@@ -435,10 +437,9 @@ done <column_name_list.txt
 
 done
 
-  
 #####################################################################
   
-  #export the no mitochondira and no chloroplast table out for differential abudance test in deseq2 
+  #export the no mitochondira and no chloroplast table out for differential abudance test in deseq2 package in R
   
    qiime tools export \
     --input-path living_mulch_no_blank_no_20_filtered-no-mitochondria-no-chloroplast.qza \
@@ -459,110 +460,5 @@ done
    biom convert -i feature-table.biom -o living_mulch_no_blank_no_20_filtered-no-mitochondria-no-chloroplast-19000-rarefied.txt --to-tsv
    
 
-   
-##############################################################################
 
-         qiime feature-table filter-samples \
-  --i-table living_mulch_no_blank_no_20_filtered-no-mitochondria-no-chloroplast.qza \
-  --m-metadata-file living_mulch_data_metafile_massalin.tsv \
-  --p-where "[treatment] IN ('CerealRye')" \
-  --o-filtered-table CerealRye-table-no-mitochondria-no-chloroplast.qza
   
-    qiime feature-table summarize \
-   --i-table CerealRye-table-no-mitochondria-no-chloroplast.qza \
-   --o-visualization CerealRye-table-no-mitochondria-no-chloroplast.qzv
-  
-         qiime feature-table filter-samples \
-  --i-table living_mulch_no_blank_no_20_filtered-no-mitochondria-no-chloroplast.qza \
-  --m-metadata-file living_mulch_data_metafile_massalin.tsv \
-  --p-where "[treatment] IN ('CrimsonClover')" \
-  --o-filtered-table CrimsonClover-table-no-mitochondria-no-chloroplast.qza
-  
-    qiime feature-table summarize \
-   --i-table CrimsonClover-table-no-mitochondria-no-chloroplast.qza \
-   --o-visualization CrimsonClover-table-no-mitochondria-no-chloroplast.qzv
-  
-         qiime feature-table filter-samples \
-  --i-table living_mulch_no_blank_no_20_filtered-no-mitochondria-no-chloroplast.qza \
-  --m-metadata-file living_mulch_data_metafile_massalin.tsv \
-  --p-where "[treatment] IN ('LivingMulch')" \
-  --o-filtered-table LivingMulch-table-no-mitochondria-no-chloroplast.qza
-  
-      qiime feature-table summarize \
-   --i-table LivingMulch-table-no-mitochondria-no-chloroplast.qza \
-   --o-visualization LivingMulch-table-no-mitochondria-no-chloroplast.qzv
-  
-  
-           qiime feature-table filter-samples \
-  --i-table living_mulch_no_blank_no_20_filtered-no-mitochondria-no-chloroplast.qza \
-  --m-metadata-file living_mulch_data_metafile_massalin.tsv \
-  --p-where "[treatment] IN ('NoCover')" \
-  --o-filtered-table NoCover-table-no-mitochondria-no-chloroplast.qza
-  
-      qiime feature-table summarize \
-   --i-table NoCover-table-no-mitochondria-no-chloroplast.qza \
-   --o-visualization NoCover-table-no-mitochondria-no-chloroplast.qzv
-
-##############################################################################
-
-   qiime diversity core-metrics-phylogenetic \
-   --i-phylogeny rooted-tree.qza \
-   --i-table CerealRye-table-no-mitochondria-no-chloroplast.qza \
-   --p-sampling-depth 25000 \
-   --m-metadata-file living_mulch_data_metafile_massalin.tsv \
-   --output-dir core-metrics-results-CerealRye-table-no-mitochondria-no-chloroplast-25000
-   
-    qiime diversity core-metrics-phylogenetic \
-   --i-phylogeny rooted-tree.qza \
-   --i-table CrimsonClover-table-no-mitochondria-no-chloroplast.qza \
-   --p-sampling-depth 19000 \
-   --m-metadata-file living_mulch_data_metafile_massalin.tsv \
-   --output-dir core-metrics-results-CrimsonClover-table-no-mitochondria-no-chloroplast-19000
-   
-   
-    qiime diversity core-metrics-phylogenetic \
-   --i-phylogeny rooted-tree.qza \
-   --i-table  LivingMulch-table-no-mitochondria-no-chloroplast.qza \
-   --p-sampling-depth 31000 \
-   --m-metadata-file living_mulch_data_metafile_massalin.tsv \
-   --output-dir core-metrics-results-LivingMulch-table-no-mitochondria-no-chloroplast-31000
-   
-    qiime diversity core-metrics-phylogenetic \
-   --i-phylogeny rooted-tree.qza \
-   --i-table NoCover-table-no-mitochondria-no-chloroplast.qza \
-   --p-sampling-depth 34000 \
-   --m-metadata-file living_mulch_data_metafile_massalin.tsv \
-   --output-dir core-metrics-results-NoCover-table-no-mitochondria-no-chloroplast-34000
-
-###################################################################################################
-  
-   results_path="core-metrics-results-NoCover-table-no-mitochondria-no-chloroplast-34000 core-metrics-results-LivingMulch-table-no-mitochondria-no-chloroplast-31000 core-metrics-results-CrimsonClover-table-no-mitochondria-no-chloroplast-19000 core-metrics-results-CerealRye-table-no-mitochondria-no-chloroplast-25000"
-    
-while read line ; do
-    echo $line
-    
-    for path in $results_path
-do
-      echo $path
-    
-    qiime diversity alpha-group-significance \
-  --i-alpha-diversity $path/${line}.qza \
-  --m-metadata-file living_mulch_data_metafile_massalin.tsv \
-  --o-visualization $path/${line}-group-sginificance.qzv
-    
-      qiime diversity alpha-correlation \
-  --i-alpha-diversity $path/${line}.qza \
-  --m-metadata-file living_mulch_data_metafile_massalin.tsv \
-  --o-visualization $path/${line}_correlation.qzv
-done
-  
-done <alpha_diversity_metrics.txt
-
-
-################################################
-
-      qiime diversity bioenv \
-  --i-distance-matrix core-metrics-results-living_mulch_filtered_no_Inrow_no_blank_no20S600-19000-2/weighted_unifrac_distance_matrix.qza \
-  --m-metadata-file living_mulch_data_metafile_massalin.tsv  \
-  --o-visualization living_mulch_data_bio_enviroment.qzv
-
